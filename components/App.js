@@ -19,6 +19,7 @@
  const API_DEBOUNCE_TIME = 2000;
 
  class App extends Component {
+    // initial
      state = {
          mapRegion: null,
          gpsAccuracy: null,
@@ -29,6 +30,7 @@
      }
      watchID = null
 
+     // observe geolocation when app renders and stop and unmounts
      componentWillMount() {
          this.watchID = navigator.geolocation.watchPosition((position) => {
              let region = {
@@ -41,14 +43,14 @@
              this.onRegionChange(region, position.coords.accuracy);
          });
      }
-
+     // cleanup
      componentWillUnmount() {
          navigator.geolocation.clearWatch(this.watchID);
      }
-
+     // mapview callback for zoom/pans
      onRegionChange(region, gpsAccuracy) {
          this.fetchVenues(region);
-
+    // change region &  movement
          this.setState({
              mapRegion: region,
              gpsAccuracy: gpsAccuracy || this.state.gpsAccuracy
@@ -108,18 +110,19 @@
      render() {
          const { mapRegion, lookingFor } = this.state;
 
-         if (mapRegion) {
+         if (mapRegion) { // find a location and rerender
              return (
                  <Screen>
-                     <RecommendationsMap {...this.state} onRegionChange={this.onRegionChange.bind(this)} />
+                     <RecommendationsMap {...this.state}
+                       onRegionChange={this.onRegionChange.bind(this)} />
 
                      {!lookingFor ? <OverlayTopics onTopicSelect={this.onTopicSelect.bind(this)} />
                                   : <BottomTopics onTopicSelect={this.onTopicSelect.bind(this)} />}
                  </Screen>
              );
-         }else{
+         }else{ //spinner image
              return (
-                 <Screen style={styles.centered}>
+                 <Screen style={styles.centered}> //view in shoutem
                      <Spinner styleName="large" />
                  </Screen>
              );
